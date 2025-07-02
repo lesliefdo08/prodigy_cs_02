@@ -1,0 +1,53 @@
+from PIL import Image
+import numpy as np
+
+SECRET_KEY = 50
+
+def lock_image():
+    source = input(" Enter original image path: ")
+    locked = input(" Save encrypted image as: ")
+
+    try:
+        img = Image.open(source)
+        pixel_data = np.asarray(img).astype(np.int16) 
+
+        locked_data = (pixel_data + SECRET_KEY) % 256
+        locked_img = Image.fromarray(locked_data.astype('uint8'))  
+
+        locked_img.save(locked)
+        print("Image successfully locked and stored at:", locked)
+    except Exception as err:
+        print("Failed to lock image. Reason:", err)
+
+
+def unlock_image():
+    encrypted = input("Enter encrypted image path: ")
+    unlocked = input("Save decrypted image as: ")
+
+    try:
+        img = Image.open(encrypted)
+        data = np.asarray(img).astype(np.int16)
+
+        # Reverse the encryption
+        original_data = (data - SECRET_KEY) % 256
+        original_img = Image.fromarray(original_data.astype('uint8'))
+
+        original_img.save(unlocked)
+        print("Image successfully unlocked and saved at:", unlocked)
+    except Exception as err:
+        print("Decryption failed. Reason:", err)
+
+
+def main():
+    print("Image Locker System")
+    action = input("Choose action - (l)ock or (u)nlock: ").strip().lower()
+
+    if action == 'l':
+        lock_image()
+    elif action == 'u':
+        unlock_image()
+    else:
+        print("Invalid input. Type 'l' to lock or 'u' to unlock.")
+
+if __name__ == "__main__":
+    main()
